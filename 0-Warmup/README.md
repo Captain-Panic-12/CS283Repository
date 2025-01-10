@@ -7,8 +7,8 @@
 
 2.    I have installed my virtual machine, tested it, feel comfortable using it, and validated that the required software is installed:
    - [ ] YES
-    - [x] N/A - I plan to use tux
-    - [ ] NO - Not Yet
+   - [x] N/A - I plan to use tux
+   - [ ] NO - Not Yet
 
 3.    Please provide a link to the repository you are using for this class.
     https://github.com/Captain-Panic-12/CS283Repository
