@@ -6,7 +6,7 @@
     - [ ] Somthing else (put name here)
 
 2.    I have installed my virtual machine, tested it, feel comfortable using it, and validated that the required software is installed:
-    - [ ] YES
+   - [ ] YES
     - [x] N/A - I plan to use tux
     - [ ] NO - Not Yet
 
