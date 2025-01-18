@@ -56,9 +56,96 @@ void usage(char *exename){
 }
 
 int count_words(char *buff, int len, int str_len){
-    bool word_start = false;
+    //Word Start is a boolean, but technically boolean isn't included in the libraries included at the top of the document
+    // I'd rather not lose points, so we're treating '0' as false, '1' as true.
+    int word_start;
+    int wc;
+
+    word_start = 0;
+    wc = 0;
+    for(int i = 0; i<len; i++){
+        char c_char = *(buff + i);
+        if (word_start == 0){
+            if (c_char == ' ' || c_char == '.'){
+                continue;
+            }
+            else {
+                wc++;
+                word_start = 1;
+            }
+        }
+        else{
+            if (c_char == ' '){
+                word_start = 0;
+            }
+            else{
+                continue;
+            }
+        }
+    }
     //YOU MUST IMPLEMENT
-    return 0;
+    return wc;
+}
+
+void reverse_string(char *buff, int len){
+    int end_idx = len - 1;
+    int start_idx = 0;
+    char temp_char;
+    while (end_idx > start_idx){
+        temp_char = *(buff +start_idx);
+        *(buff + start_idx) = *(buff + end_idx);
+        *(buff + end_idx) = temp_char;
+        start_idx++;
+        end_idx--;
+    }
+}
+
+void  word_print(char *buff, int len){
+    //suggested local variables
+    int last_char_idx;  //index of last char - strlen(str)-1;
+    int wc = 0;         //counts words
+    int wlen = 0;       //length of current word
+    int word_start = 0;    //am I at the start of a new word
+    last_char_idx = len - 1;
+    // Please implement
+    word_start = 0;
+
+    for (int i = 0; i < len; i++){
+        char c_char = *(buff + i);
+        if (word_start == 0) {
+            if (c_char == ' '){
+                printf(" (%d)\n", wlen);
+                word_start = 0;
+                wlen = 0;
+            }
+            else {
+                wc++;
+                word_start = 1;
+                //wlen = 0;
+                wlen++;
+                printf("%d. ", wc);
+                printf("%c",c_char);
+            }
+        }
+        else{
+            if (c_char != ' '){
+                printf("%c",c_char);
+                wlen++;
+            }
+            else{
+               printf(" (%d)\n", wlen); 
+               word_start = 0; 
+               wlen = 0;
+            }
+        }
+        if (i == last_char_idx && wlen > 0){
+               printf(" (%d)\n", wlen);
+               word_start = 0;
+               wlen = 0;
+            }
+        
+    }
+    return;
 }
 
 //ADD OTHER HELPER FUNCTIONS HERE FOR OTHER REQUIRED PROGRAM OPTIONS
@@ -127,6 +214,14 @@ int main(int argc, char *argv[]){
 
         //TODO:  #5 Implement the other cases for 'r' and 'w' by extending
         //       the case statement options
+        case 'r':
+            reverse_string(buff,user_str_len);
+            break;
+
+        case 'w':
+            printf("Word Print\n----------\n");
+            word_print(buff,user_str_len);
+            break;
         default:
             usage(argv[0]);
             exit(1);

@@ -46,7 +46,31 @@ int count_words(char *str){
     bool word_start;
 
     // Please implement
-    return 0;
+    len = strlen(str);
+    word_start = false;
+    int i;
+    wc = 0;
+    for (i = 0; i < len; i++){
+        char c_char = str[i];
+        if (word_start == false) {
+            if (c_char == SPACE_CHAR){
+                continue;
+            }
+            else {
+                wc++;
+                word_start = true;
+            }
+        }
+        else{
+            if (c_char == SPACE_CHAR){
+                word_start = false;
+            }
+            else{
+                continue;
+            }
+        }
+    }
+    return wc;
 }
 
 //reverse_string() algorithm
@@ -71,7 +95,15 @@ void  reverse_string(char *str){
     char tmp_char;
 
     // Please implement
-
+    end_idx = strlen(str) - 1;
+    start_idx = 0;
+    while (end_idx > start_idx){
+        tmp_char = str[start_idx];
+        str[start_idx] = str[end_idx];
+        str[end_idx] = tmp_char;
+        start_idx++;
+        end_idx--;
+    }
     return;
 }
 
@@ -119,6 +151,45 @@ void  word_print(char *str){
     bool word_start = false;    //am I at the start of a new word
 
     // Please implement
+    len = strlen(str);
+    word_start = false;
+
+    int i;
+    wc = 0;
+    for (i = 0; i < len; i++){
+        char c_char = str[i];
+        if (word_start == false) {
+            if (c_char == SPACE_CHAR){
+                printf(" (%d)\n", wlen);
+                word_start = false;
+                wlen = 0;
+            }
+            else {
+                wc++;
+                word_start = true;
+                //wlen = 0;
+                wlen++;
+                printf("%d. ", wc);
+                printf("%c",c_char);
+            }
+        }
+        else{
+            if (c_char != SPACE_CHAR){
+                printf("%c",c_char);
+                wlen++;
+            }
+            else{
+               continue;
+            }
+        }
+        if (i == last_char_idx){
+                printf(" (%d)\n", wlen);
+               word_start = false;
+               wlen = 0;
+            }
+        
+    }
+    return;
 }
 
 
@@ -165,11 +236,13 @@ int main(int argc, char *argv[]){
 
             //TODO: #2. Call count_words, return of the result
             //          should go into the wc variable
+            wc = count_words(input_string);
             printf("Word Count: %d\n", wc);
             break;
         case 'r':
             //TODO: #3. Call reverse string using input_string
             //          input string should be reversed
+            reverse_string(input_string);
             printf("Reversed string: %s\n", input_string);
 
             //TODO:  #4.  The algorithm provided in the directions 
@@ -183,6 +256,7 @@ int main(int argc, char *argv[]){
 
             //TODO: #5. Call word_print, output should be
             //          printed by that function
+            word_print(input_string);
             break;
 
         //TODO: #6. What is the purpose of the default option here?
