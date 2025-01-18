@@ -43,10 +43,11 @@ int setup_buff(char *buff, char *user_str, int len){
 }
 
 void print_buff(char *buff, int len){
-    printf("Buffer:  ");
+    printf("Buffer:  [");
     for (int i=0; i<len; i++){
         putchar(*(buff+i));
     }
+    putchar(']');
     putchar('\n');
 }
 
@@ -91,6 +92,7 @@ void reverse_string(char *buff, int len){
     int end_idx = len - 1;
     int start_idx = 0;
     char temp_char;
+    // Goes through buff, uses temp var to hold first value when doing it's swaps. 
     while (end_idx > start_idx){
         temp_char = *(buff +start_idx);
         *(buff + start_idx) = *(buff + end_idx);
@@ -133,13 +135,13 @@ void  word_print(char *buff, int len){
                 wlen++;
             }
             else{
-               printf(" (%d)\n", wlen); 
+               printf("(%d)\n", wlen); 
                word_start = 0; 
                wlen = 0;
             }
         }
         if (i == last_char_idx && wlen > 0){
-               printf(" (%d)\n", wlen);
+               printf("(%d)\n", wlen);
                word_start = 0;
                wlen = 0;
             }
@@ -189,9 +191,9 @@ int main(int argc, char *argv[]){
     //          return code of 99
     // CODE GOES HERE FOR #3
 
-    *buff = malloc(BUFFER_SZ);
+    buff = malloc(BUFFER_SZ);
 
-    if (*buff == NULL){
+    if (buff == NULL){
         exit(99);
     }
 
@@ -221,6 +223,11 @@ int main(int argc, char *argv[]){
         case 'w':
             printf("Word Print\n----------\n");
             word_print(buff,user_str_len);
+            rc = count_words(buff, BUFFER_SZ, user_str_len);  //you need to implement
+            printf("\nNumber of words returned: %d \n",rc);
+            break;
+        case 'x':
+            printf("Not Implemented!");
             break;
         default:
             usage(argv[0]);
@@ -229,6 +236,7 @@ int main(int argc, char *argv[]){
 
     //TODO:  #6 Dont forget to free your buffer before exiting
     print_buff(buff,BUFFER_SZ);
+    free(buff);
     exit(0);
 }
 
