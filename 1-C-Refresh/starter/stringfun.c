@@ -12,12 +12,17 @@ int  setup_buff(char *, char *, int);
 
 //prototypes for functions to handle required functionality
 int  count_words(char *, int, int);
+void reverse_string(char *,int);
+void word_print(char *, int);
 //add additional prototypes here
 
-
+// Goes through each character in string and copies it over to the buffer. It checks if the current char is a space, or a 
+// tab, and either ignores it, or copies it to the buffer respectively. 
+// if input string is longer than the buffer, then it notifies the user, and exits the program. 
+// Any trailing whitespace is filled in with '.' 
 int setup_buff(char *buff, char *user_str, int len){
     int i, j = 0;
-    while (*(user_str + i) != '\0' && j < len) {
+    while (*(user_str + i) != '\0') {
         if (*(user_str + i) != ' ' && *(user_str + i) != '\t') {
             *(buff + j) = *(user_str + i);
             ++j;
@@ -30,17 +35,26 @@ int setup_buff(char *buff, char *user_str, int len){
         }
         ++i;
     }
-
-    if (j > len) {
-        return -1;
+    
+    
+    if (j > len){
+        printf("Provided input string is too long\n"); 
+        exit(3);
     }
 
-    for(int k = j; k < len; k++){
-        *(buff + k) = '.';
+    //This loop verifies that every trailing whitespace in the buffer is replaced with a '.'
+    for (int k = j ; k < len; k++) { 
+        if (*(buff + k - 1) == ' '){
+            *(buff + k - 1) = '.';
+        }
+        *(buff + k) = '.'; 
     }
 
-    return j; //for now just so the code compiles. 
+
+    return j;
+    
 }
+
 
 void print_buff(char *buff, int len){
     printf("Buffer:  [");
@@ -55,16 +69,17 @@ void usage(char *exename){
     printf("usage: %s [-h|c|r|w|x] \"string\" [other args]\n", exename);
 
 }
-
+ //Aside from the word count thing, I feel like this code is self explanatory 
 int count_words(char *buff, int len, int str_len){
     //Word Start is a boolean, but technically boolean isn't included in the libraries included at the top of the document
     // I'd rather not lose points, so we're treating '0' as false, '1' as true.
     int word_start;
     int wc;
+    int i = 0;
 
     word_start = 0;
     wc = 0;
-    for(int i = 0; i<len; i++){
+    for(i; i<str_len; i++){
         char c_char = *(buff + i);
         if (word_start == 0){
             if (c_char == ' ' || c_char == '.'){
@@ -76,7 +91,7 @@ int count_words(char *buff, int len, int str_len){
             }
         }
         else{
-            if (c_char == ' '){
+            if (c_char == ' ' || c_char == '.'){
                 word_start = 0;
             }
             else{
@@ -88,11 +103,14 @@ int count_words(char *buff, int len, int str_len){
     return wc;
 }
 
+// Traverses the buffer, getting the first value and storing it into a temp var. 
+// Then we point the contents of the end of the buffer to the start of the buffer
+// We then overwrite the contents of the end of the buffer, with the contents of the temp var
+// we then increment the "start" of the buffer, and decrement the "end" of the buffer and repeat the process.
 void reverse_string(char *buff, int len){
     int end_idx = len - 1;
     int start_idx = 0;
     char temp_char;
-    // Goes through buff, uses temp var to hold first value when doing it's swaps. 
     while (end_idx > start_idx){
         temp_char = *(buff +start_idx);
         *(buff + start_idx) = *(buff + end_idx);
@@ -102,6 +120,11 @@ void reverse_string(char *buff, int len){
     }
 }
 
+
+// Goes through buffer looking at the "current character" or "c_char" for each iteration of the loop. 
+//  the loop determines that if we aren't in a new word, then the next time we see a ' ' character, we're starting a new word
+// Until we hit that space character, we're going to continue printing each character in the current word,
+// and track how many characters are in it , once we hit space we print the character count in the word, and start a new line
 void  word_print(char *buff, int len){
     //suggested local variables
     int last_char_idx;  //index of last char - strlen(str)-1;
@@ -111,7 +134,6 @@ void  word_print(char *buff, int len){
     last_char_idx = len - 1;
     // Please implement
     word_start = 0;
-
     for (int i = 0; i < len; i++){
         char c_char = *(buff + i);
         if (word_start == 0) {
@@ -162,6 +184,8 @@ int main(int argc, char *argv[]){
 
     //TODO:  #1. WHY IS THIS SAFE, aka what if arv[1] does not exist?
     //      PLACE A COMMENT BLOCK HERE EXPLAINING
+
+    // This determines that there's at least 2 arguments being passed to the executeable. 
     if ((argc < 2) || (*argv[1] != '-')){
         usage(argv[0]);
         exit(1);
@@ -224,11 +248,11 @@ int main(int argc, char *argv[]){
             printf("Word Print\n----------\n");
             word_print(buff,user_str_len);
             rc = count_words(buff, BUFFER_SZ, user_str_len);  //you need to implement
-            printf("\nNumber of words returned: %d \n",rc);
+            printf("Number of words returned: %d \n",rc);
             break;
         case 'x':
             printf("Not Implemented!");
-            break;
+            exit(1);
         default:
             usage(argv[0]);
             exit(1);
@@ -247,3 +271,6 @@ int main(int argc, char *argv[]){
 //          the buff variable will have exactly 50 bytes?
 //  
 //          PLACE YOUR ANSWER HERE
+
+//It's basically future proofing, it makes it easier to change the buffer size because only one variable needs to be changed for a different 
+// Buffer size to be used. 
