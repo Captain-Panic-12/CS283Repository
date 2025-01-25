@@ -1,0 +1,3 @@
+[submodule "2-StudentDB"]
+	path = 2-StudentDB
+	url = https://github.com/Captain-Panic-12/CS283Repository.git
