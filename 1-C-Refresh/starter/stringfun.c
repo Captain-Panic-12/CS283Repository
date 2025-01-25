@@ -216,7 +216,6 @@ int main(int argc, char *argv[]){
     // CODE GOES HERE FOR #3
 
     buff = malloc(BUFFER_SZ);
-
     if (buff == NULL){
         exit(99);
     }
