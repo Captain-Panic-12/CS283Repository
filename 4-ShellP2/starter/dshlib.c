@@ -51,21 +51,130 @@
  *  Standard Library Functions You Might Want To Consider Using (assignment 2+)
  *      fork(), execvp(), exit(), chdir()
  */
-int exec_local_cmd_loop()
-{
-    char *cmd_buff;
-    int rc = 0;
-    cmd_buff_t cmd;
 
-    // TODO IMPLEMENT MAIN LOOP
+// As the name suggests, this handles built in cmds, such as exit or cd. 
+ int handle_builtin_cmd(cmd_buff_t *cmd)
+ {
+     if (strcmp(cmd->argv[0], EXIT_CMD) == 0)
+     {
+         exit(0);
+     }
+     else if (strcmp(cmd->argv[0], "cd") == 0)
+     {
+         if (cmd->argc > 1)
+         {
+             if (chdir(cmd->argv[1]) != 0)
+             {
+                 perror("cd");
+             }
+         }
+         return OK;
+     }
+ 
+     return -1;
+ }
+ 
+ // This function sets up the command buffer, and ensures the input is null terminated.
+ // If an improper command is passed, then it returns an error code. 
+ int parse_input(const char *input, cmd_buff_t *cmd) {
+    char buffer[SH_CMD_MAX];
+    strncpy(buffer, input, SH_CMD_MAX - 1);
+    buffer[SH_CMD_MAX - 1] = '\0';  
 
-    // TODO IMPLEMENT parsing input to cmd_buff_t *cmd_buff
+    cmd->argc = 0;
+    cmd->_cmd_buffer = strdup(buffer);
 
-    // TODO IMPLEMENT if built-in command, execute builtin logic for exit, cd (extra credit: dragon)
-    // the cd command should chdir to the provided directory; if no directory is provided, do nothing
+    char *ptr = cmd->_cmd_buffer;
+    while (*ptr) {
+        while (*ptr == ' ') ptr++;
+        if (*ptr == '\0') break;
 
-    // TODO IMPLEMENT if not built-in command, fork/exec as an external command
-    // for example, if the user input is "ls -l", you would fork/exec the command "ls" with the arg "-l"
+        if (*ptr == '"' || *ptr == '\'') {
+            char quote = *ptr++;
+            cmd->argv[cmd->argc] = ptr;
+            while (*ptr && *ptr != quote) ptr++;
+            if (*ptr) *ptr++ = '\0';  
+            else {
+                return ERR_EXEC_CMD; 
+            }
+        } else {
+            cmd->argv[cmd->argc] = ptr;
+            while (*ptr && *ptr != ' ') ptr++;
+            if (*ptr) *ptr++ = '\0';  
+        }
 
-    return OK;
+        cmd->argc++;
+        if (cmd->argc >= CMD_ARGV_MAX) break;  
+    }
+
+    cmd->argv[cmd->argc] = NULL;  
+
+    return (cmd->argc == 0) ? WARN_NO_CMDS : OK;
 }
+// This function performs the fork and exec commands, by forking a new process and then executing the child process. 
+// If an error occurs, then it returns the approriate error code. 
+int fork_and_exec_cmd(cmd_buff_t *cmd) {
+    pid_t pid = fork();
+    if (pid < 0) {
+        perror("fork");
+        return ERR_MEMORY;
+    } else if (pid == 0) {
+        if (execvp(cmd->argv[0], cmd->argv) == -1) {
+            return ERR_EXEC_CMD
+        }
+    } else {
+        int status;
+        waitpid(pid, &status, 0);
+        if (WIFEXITED(status)) {
+            return WEXITSTATUS(status);
+        } else {
+            return ERR_MEMORY;
+        }
+    }
+}
+
+ // This code acts a loop, waiting for the user to input the prebuilt commands and then execute them, until told to exit. 
+ int exec_local_cmd_loop()
+ {
+     char cmd_buff[SH_CMD_MAX];
+     cmd_buff_t cmd;
+     int rc;
+ 
+     while (1)
+     {
+         printf("%s", SH_PROMPT);
+         if (fgets(cmd_buff, SH_CMD_MAX, stdin) == NULL)
+         {
+             printf("\n");
+             break;
+         }
+ 
+         cmd_buff[strcspn(cmd_buff, "\n")] = '\0';
+ 
+         rc = parse_input(cmd_buff, &cmd);
+         if (rc == WARN_NO_CMDS)
+         {
+             printf("%s\n", CMD_WARN_NO_CMD);
+             continue;
+         }
+         else if (rc != OK)
+         {
+             fprintf(stderr, "Error: %d\n", rc);
+             continue;
+         }
+ 
+         if (handle_builtin_cmd(&cmd) == OK)
+         {
+             continue;
+         }
+ 
+         rc = fork_and_exec_cmd(&cmd);
+         if (rc != OK)
+         {
+            return ERR_EXEC_CMD;
+         }
+     }
+ 
+     return OK;
+ }
+ 
