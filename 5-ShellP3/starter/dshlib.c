@@ -86,7 +86,7 @@ int fork_and_exec_cmd(cmd_buff_t *cmd, int in_fd, int out_fd) {
     if (pid < 0) {
         perror("fork");
         return ERR_MEMORY;
-    } else if (pid == 0) { // Child process
+    } else if (pid == 0) { 
         if (in_fd != STDIN_FILENO) {
             dup2(in_fd, STDIN_FILENO);
             close(in_fd);
