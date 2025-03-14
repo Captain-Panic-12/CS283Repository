@@ -19,4 +19,6 @@ If CD were an external command, it wouldnt be able to modify the parent enviornm
 
 4. Currently, your shell supports a fixed number of piped commands (CMD_MAX). How would you modify your implementation to allow an arbitrary number of piped commands while still handling memory allocation efficiently? What trade-offs would you need to consider?
 
-_answer here_
+Essentially we start with a default value, and then when a new command goes past that limit, we double the size of the allocated memory using relloac()
+
+The tradoffs are that this will complicate memory management and 
